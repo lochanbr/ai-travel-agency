@@ -1,10 +1,43 @@
 "use client";
 
-import { APIProvider, Map, AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
+import { APIProvider, Map, AdvancedMarker, Pin, useMap } from "@vis.gl/react-google-maps";
+import { useEffect } from "react";
 import { Destination } from "./journey-map";
 
 interface InteractiveMapProps {
   destination: Destination;
+}
+
+function MapInner({ destination }: InteractiveMapProps) {
+  const map = useMap("travel-quest-map");
+
+  useEffect(() => {
+    if (map && destination.coordinates) {
+      map.panTo(destination.coordinates);
+      map.setZoom(11);
+    }
+  }, [map, destination]);
+
+  return (
+    <Map
+      defaultZoom={11}
+      defaultCenter={destination.coordinates}
+      mapId="travel-quest-map"
+      disableDefaultUI={true}
+    >
+      {/* Main Destination Marker */}
+      <AdvancedMarker position={destination.coordinates}>
+        <Pin background={"var(--primary)"} glyphColor={"#fff"} borderColor={"var(--primary)"} />
+      </AdvancedMarker>
+
+      {/* Attraction Markers */}
+      {destination.attractions.map((attraction, i) => (
+        <AdvancedMarker key={i} position={attraction.coordinates}>
+          <Pin background={"var(--accent)"} glyphColor={"#fff"} borderColor={"var(--accent)"} />
+        </AdvancedMarker>
+      ))}
+    </Map>
+  );
 }
 
 export function InteractiveMap({ destination }: InteractiveMapProps) {
@@ -18,30 +51,10 @@ export function InteractiveMap({ destination }: InteractiveMapProps) {
     );
   }
 
-  // Calculate generic bounds or default center based on the destination's coordinate
-  const center = destination.coordinates;
-
   return (
     <div className="w-full h-64 rounded-xl overflow-hidden mt-4 border border-border">
       <APIProvider apiKey={apiKey}>
-        <Map
-          defaultZoom={11}
-          defaultCenter={center}
-          mapId="travel-quest-map"
-          disableDefaultUI={true}
-        >
-          {/* Main Destination Marker */}
-          <AdvancedMarker position={destination.coordinates}>
-            <Pin background={"var(--primary)"} glyphColor={"#fff"} borderColor={"var(--primary)"} />
-          </AdvancedMarker>
-
-          {/* Attraction Markers */}
-          {destination.attractions.map((attraction, i) => (
-            <AdvancedMarker key={i} position={attraction.coordinates}>
-              <Pin background={"var(--accent)"} glyphColor={"#fff"} borderColor={"var(--accent)"} />
-            </AdvancedMarker>
-          ))}
-        </Map>
+        <MapInner destination={destination} />
       </APIProvider>
     </div>
   );

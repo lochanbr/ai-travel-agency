@@ -51,13 +51,7 @@ export function HeroSection({ onStartPlanning }: HeroSectionProps) {
             Start Planning
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="px-8 py-6 text-lg"
-          >
-            Watch Demo
-          </Button>
+
         </div>
 
         <div className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">

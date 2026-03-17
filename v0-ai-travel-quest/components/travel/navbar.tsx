@@ -5,13 +5,20 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { ThemeSelector } from '@/components/theme-selector';
 import { UserMenu } from '@/components/user-menu';
-import { AuthModal } from '@/components/auth-modal';
 import { useAuth } from '@/lib/contexts/auth-context';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [authOpen, setAuthOpen] = useState(false);
-  const { user, isLoading } = useAuth();
+  const [instructionsOpen, setInstructionsOpen] = useState(false);
+  const { user } = useAuth();
 
   return (
     <>
@@ -28,31 +35,17 @@ export function Navbar() {
             </div>
 
             <div className="hidden md:flex items-center gap-8">
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                Destinations
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+              <button
+                onClick={() => setInstructionsOpen(true)}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
                 How It Works
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                Pricing
-              </a>
+              </button>
             </div>
 
             <div className="hidden md:flex items-center gap-3">
               <ThemeSelector />
-              {user ? (
-                <UserMenu />
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setAuthOpen(true)}
-                  disabled={isLoading}
-                >
-                  Sign In
-                </Button>
-              )}
+              {user && <UserMenu />}
             </div>
 
             <button
@@ -67,39 +60,54 @@ export function Navbar() {
         {isOpen && (
           <div className="md:hidden bg-background border-b border-border">
             <div className="px-4 py-4 space-y-4">
-              <a href="#" className="block text-muted-foreground hover:text-foreground">
-                Destinations
-              </a>
-              <a href="#" className="block text-muted-foreground hover:text-foreground">
+              <button
+                onClick={() => {
+                  setInstructionsOpen(true);
+                  setIsOpen(false);
+                }}
+                className="block text-muted-foreground hover:text-foreground"
+              >
                 How It Works
-              </a>
-              <a href="#" className="block text-muted-foreground hover:text-foreground">
-                Pricing
-              </a>
+              </button>
               <div className="flex gap-2 pt-2">
                 <ThemeSelector />
-                {user ? (
-                  <UserMenu />
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => {
-                      setAuthOpen(true);
-                      setIsOpen(false);
-                    }}
-                    disabled={isLoading}
-                  >
-                    Sign In
-                  </Button>
-                )}
+                {user && <UserMenu />}
               </div>
             </div>
           </div>
         )}
       </nav>
-      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+
+      <Dialog open={instructionsOpen} onOpenChange={setInstructionsOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>How It Works</DialogTitle>
+            <DialogDescription>
+              A quick guide to using AI Travel Quest.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm">1. Enter Your Details</h4>
+              <p className="text-sm text-muted-foreground">
+                Start by typing your desired destination, total trip budget, duration in days, and your preferred travel style.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm">2. AI Generates Your Plan</h4>
+              <p className="text-sm text-muted-foreground">
+                Our smart AI analyzes your inputs and generates a personalized daily itinerary, assigning an expected budget to each location.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm">3. The Interactive Quest</h4>
+              <p className="text-sm text-muted-foreground">
+                Your journey turns into an interactive quest! Follow the map, visit top attractions at your active location, and click &apos;Complete & Travel Next&apos; to unlock the next destination on your trip.
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
